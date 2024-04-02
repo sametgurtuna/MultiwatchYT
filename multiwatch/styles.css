@@ -1,0 +1,91 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f3f3f3;
+}
+
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+}
+
+input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 8px 15px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#videoContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100vw; /* Ekran genişliği kadar genişlik */
+}
+
+.video {
+  margin: 10px;
+  position: relative;
+  flex: 1 1 100%; /* İlk başta, tüm videolar ekrana eşit olarak sığacak şekilde genişletilir */
+}
+
+@media (min-width: 600px) {
+  .video {
+    flex-basis: calc(
+      50% - 20px
+    ); /* Ekran genişliğine bağlı olarak videoların boyutunu ayarlar */
+  }
+}
+
+@media (min-width: 900px) {
+  .video {
+    flex-basis: calc(
+      33.33% - 20px
+    ); /* Ekran genişliğine bağlı olarak videoların boyutunu ayarlar */
+  }
+}
+
+@media (min-width: 1200px) {
+  .video {
+    flex-basis: calc(
+      25% - 20px
+    ); /* Ekran genişliğine bağlı olarak videoların boyutunu ayarlar */
+  }
+}
+
+iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+.closeButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
