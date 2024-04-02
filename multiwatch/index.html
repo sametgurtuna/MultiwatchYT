@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multiwatch</title>
-    <style>
+    <!-- Light Mode CSS -->
+    <style id="lightMode">
       body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f3f3f3;
+        color: #333;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       header {
@@ -17,6 +20,8 @@
         color: #fff;
         padding: 20px;
         text-align: center;
+        position: relative;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       h1 {
@@ -72,6 +77,27 @@
         font-size: 20px;
         cursor: pointer;
       }
+
+      /* Ayar Düğmesi */
+      .settingsButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px;
+        cursor: pointer;
+      }
+    </style>
+    <!-- Dark Mode CSS -->
+    <style id="darkMode">
+      body.dark-mode {
+        background-color: #333;
+        color: #fff;
+      }
+
+      body.dark-mode header {
+        background-color: #333;
+        color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -79,6 +105,14 @@
       <h1>Multiwatch</h1>
       <input type="text" id="youtubeLink" placeholder="YouTube Video URL" />
       <button onclick="addVideo()">Add Video</button>
+      <!-- Ayar Düğmesi -->
+      <div
+        class="settingsButton"
+        id="settingsButton"
+        onclick="toggleDarkMode()"
+      >
+        <span id="modeIcon">🌙</span>
+      </div>
     </header>
     <main id="videoContainer">
       <!-- Burası videoların görüntüleneceği bölüm -->
@@ -150,6 +184,20 @@
           videos.forEach(function (video) {
             video.style.flex = "1 1 33.33%"; // Diğer durumlarda videoları eşit olarak üçe böler
           });
+        }
+      }
+
+      // Dark Mode Toggle
+      function toggleDarkMode() {
+        var body = document.body;
+        var settingsButton = document.getElementById("settingsButton");
+        var modeIcon = document.getElementById("modeIcon");
+
+        body.classList.toggle("dark-mode");
+        if (body.classList.contains("dark-mode")) {
+          modeIcon.innerHTML = "☀️"; // Dark mode'dayken güneş simgesi göster
+        } else {
+          modeIcon.innerHTML = "🌙"; // Light mode'dayken ay simgesi göster
         }
       }
     </script>
