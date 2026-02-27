@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multiwatch</title>
-    <!-- Light Mode CSS -->
     <style id="lightMode">
+      *, *::before, *::after { box-sizing: border-box; }
+
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -16,55 +17,238 @@
       }
 
       header {
-        background-color: #333;
+        background-color: #222;
         color: #fff;
-        padding: 20px;
+        padding: 14px 20px;
         text-align: center;
         position: relative;
         transition: background-color 0.3s, color 0.3s;
       }
 
       h1 {
-        margin: 0;
+        margin: 0 0 10px 0;
+        font-size: 1.4rem;
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       input[type="text"] {
-        padding: 8px;
+        padding: 8px 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
-        margin-right: 10px;
+        font-size: 0.9rem;
+        min-width: 260px;
       }
 
       button {
-        padding: 8px 15px;
+        padding: 8px 14px;
         background-color: #4caf50;
         color: #fff;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: 0.9rem;
+        white-space: nowrap;
       }
 
-      button:hover {
-        background-color: #45a049;
+      button:hover { background-color: #45a049; }
+
+      /* Layout seçici */
+      .layout-selector {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 8px;
       }
 
+      .layout-selector label {
+        font-size: 0.8rem;
+        color: #ccc;
+        margin-right: 2px;
+      }
+
+      .layout-btn {
+        padding: 6px 10px;
+        background-color: #555;
+        color: #fff;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      .layout-btn:hover { background-color: #666; }
+      .layout-btn.active {
+        border-color: #4caf50;
+        background-color: #3a7a3d;
+      }
+
+      /* Ayar Düğmesi */
+      .settingsButton {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        padding: 5px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        line-height: 1;
+      }
+
+      /* ---- Video Container ---- */
       #videoContainer {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
-        width: 100vw;
+        justify-content: flex-start;
+        align-content: flex-start;
+        width: 100%;
+        min-height: 100px;
+        padding: 6px;
       }
 
+      /* ---- Layout modes ---- */
+      /* auto: smart flex (default) */
+      #videoContainer.layout-auto .video { flex: 1 1 auto; }
+
+      /* 1x1 */
+      #videoContainer.layout-1x1 .video { flex: 0 0 100%; max-width: 100%; }
+
+      /* 1x2  (side by side) */
+      #videoContainer.layout-1x2 .video { flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px); }
+
+      /* 2x2 */
+      #videoContainer.layout-2x2 .video { flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px); }
+
+      /* 1+2 (first full-width, rest half) */
+      #videoContainer.layout-1p2 .video:nth-child(1) { flex: 0 0 calc(100% - 12px); max-width: calc(100% - 12px); }
+      #videoContainer.layout-1p2 .video:not(:nth-child(1)) { flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px); }
+
+      /* 3x1 (three columns) */
+      #videoContainer.layout-3x1 .video { flex: 0 0 calc(33.33% - 12px); max-width: calc(33.33% - 12px); }
+
+      /* 1+3 (first half, rest third) */
+      #videoContainer.layout-1p3 .video:nth-child(1) { flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px); }
+      #videoContainer.layout-1p3 .video:not(:nth-child(1)) { flex: 0 0 calc(16.66% - 12px); max-width: calc(16.66% - 12px); }
+
+      /* 4x1 */
+      #videoContainer.layout-4x1 .video { flex: 0 0 calc(25% - 12px); max-width: calc(25% - 12px); }
+
+      /* ---- Individual Video Card ---- */
       .video {
-        margin: 10px;
+        margin: 6px;
         position: relative;
-        flex: 1 1 auto;
+        background: #000;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: flex 0.3s, max-width 0.3s;
+        min-width: 180px;
       }
 
+      /* Drag handle indicator */
+      .video.dragging {
+        opacity: 0.4;
+        outline: 2px dashed #4caf50;
+      }
+
+      .video.drag-over {
+        outline: 2px solid #4caf50;
+        background: #1a3a1a;
+      }
+
+      .drag-handle {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        background-color: rgba(0,0,0,0.6);
+        color: #fff;
+        font-size: 14px;
+        cursor: grab;
+        border-radius: 4px;
+        padding: 2px 6px;
+        z-index: 10;
+        user-select: none;
+        line-height: 1.4;
+      }
+
+      .drag-handle:active { cursor: grabbing; }
+
+      /* Player iframe wrapper */
       .video-player {
         width: 100%;
-        height: 400px;
+        height: 360px;
         border: none;
+        display: block;
+      }
+
+      /* Bottom overlay bar for controls */
+      .video-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        background: rgba(0,0,0,0.75);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .muteButton {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 4px;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      .muteButton:hover { background: transparent; filter: brightness(1.3); }
+
+      /* Volume slider */
+      .volume-slider {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        border-radius: 2px;
+        background: #888;
+        outline: none;
+        cursor: pointer;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #4caf50;
+        cursor: pointer;
+      }
+
+      .volume-slider::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #4caf50;
+        cursor: pointer;
+        border: none;
+      }
+
+      .volume-label {
+        color: #ccc;
+        font-size: 0.7rem;
+        min-width: 28px;
+        text-align: right;
       }
 
       .closeButton {
@@ -74,83 +258,65 @@
         background-color: rgba(0,0,0,0.6);
         border: none;
         color: #fff;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
         border-radius: 4px;
         line-height: 1;
         padding: 2px 6px;
+        z-index: 10;
       }
 
-      .muteButton {
-        position: absolute;
-        top: 5px;
-        right: 45px;
-        background-color: rgba(0,0,0,0.6);
-        border: none;
-        color: #fff;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 4px;
-        padding: 3px 7px;
-      }
-
-      .muteButton:hover,
-      .closeButton:hover {
-        background-color: rgba(0,0,0,0.85);
-      }
-
-      /* Ayar Düğmesi */
-      .settingsButton {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 5px;
-        cursor: pointer;
-      }
+      .closeButton:hover { background-color: rgba(180,0,0,0.85); }
     </style>
-    <!-- Dark Mode CSS -->
-    <style id="darkMode">
-      body.dark-mode {
-        background-color: #333;
-        color: #fff;
-      }
 
-      body.dark-mode header {
-        background-color: #333;
-        color: #fff;
-      }
+    <style id="darkMode">
+      body.dark-mode { background-color: #1a1a1a; color: #eee; }
+      body.dark-mode header { background-color: #111; }
     </style>
   </head>
   <body>
     <header>
       <h1>Multiwatch</h1>
-      <input type="text" id="youtubeLink" placeholder="YouTube Video URL" />
-      <button onclick="addVideo()">Add Video</button>
-      <!-- Ayar Düğmesi -->
-      <div
-        class="settingsButton"
-        id="settingsButton"
-        onclick="toggleDarkMode()"
-      >
+      <div class="header-controls">
+        <input type="text" id="youtubeLink" placeholder="YouTube Video URL" />
+        <button onclick="addVideo()">Add Video</button>
+
+        <div class="layout-selector">
+          <label>Layout:</label>
+          <button class="layout-btn active" data-layout="auto" onclick="setLayout('auto', this)" title="Otomatik">Auto</button>
+          <button class="layout-btn" data-layout="1x1" onclick="setLayout('1x1', this)" title="Tek video">1×1</button>
+          <button class="layout-btn" data-layout="1x2" onclick="setLayout('1x2', this)" title="İki yan yana">1×2</button>
+          <button class="layout-btn" data-layout="2x2" onclick="setLayout('2x2', this)" title="2×2 grid">2×2</button>
+          <button class="layout-btn" data-layout="3x1" onclick="setLayout('3x1', this)" title="Üç sütun">3×1</button>
+          <button class="layout-btn" data-layout="4x1" onclick="setLayout('4x1', this)" title="Dört sütun">4×1</button>
+          <button class="layout-btn" data-layout="1p2" onclick="setLayout('1p2', this)" title="1 büyük + 2 küçük">1+2</button>
+          <button class="layout-btn" data-layout="1p3" onclick="setLayout('1p3', this)" title="1 büyük + 3 küçük">1+3</button>
+        </div>
+      </div>
+
+      <div class="settingsButton" id="settingsButton" onclick="toggleDarkMode()">
         <span id="modeIcon">🌙</span>
       </div>
     </header>
-    <main id="videoContainer">
-      <!-- Burası videoların görüntüleneceği bölüm -->
+
+    <main id="videoContainer" class="layout-auto">
+      <!-- Videolar buraya eklenir -->
     </main>
 
     <!-- YouTube IFrame Player API -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-      var players = {}; // playerId -> YT.Player instance
+      var players = {};       // playerId -> YT.Player instance
       var playerCounter = 0;
+      var currentLayout = "auto";
 
-      // YouTube IFrame API yüklendiğinde çağrılır (global callback gerekli)
-      function onYouTubeIframeAPIReady() {
-        // API hazır; mevcut placeholder div'leri player'a dönüştür
-        // (Sayfa yüklenirken video eklenmediği için genellikle boş geçer)
-      }
+      // Drag & Drop state
+      var dragSrcEl = null;
 
+      // ---- YouTube API Ready ----
+      function onYouTubeIframeAPIReady() {}
+
+      // ---- Add Video ----
       function addVideo() {
         var youtubeLink = document.getElementById("youtubeLink").value.trim();
         if (!youtubeLink) return;
@@ -162,130 +328,238 @@
         }
 
         var main = document.getElementById("videoContainer");
-
-        // Her player için benzersiz id
         var playerId = "ytplayer-" + (++playerCounter);
 
-        // Player için placeholder div
+        // --- Wrapper div ---
+        var div = document.createElement("div");
+        div.classList.add("video");
+        div.setAttribute("draggable", "true");
+        div.dataset.playerId = playerId;
+
+        // --- Drag handle ---
+        var dragHandle = document.createElement("div");
+        dragHandle.classList.add("drag-handle");
+        dragHandle.title = "Sürükle";
+        dragHandle.innerHTML = "⠿";
+
+        // --- Player placeholder ---
         var playerDiv = document.createElement("div");
         playerDiv.id = playerId;
         playerDiv.classList.add("video-player");
 
-        // Kapat butonu
+        // --- Bottom controls bar ---
+        var controls = document.createElement("div");
+        controls.classList.add("video-controls");
+
+        // Mute button
+        var muteButton = document.createElement("button");
+        muteButton.innerHTML = "🔊";
+        muteButton.classList.add("muteButton");
+        muteButton.title = "Sesi Aç/Kapat";
+
+        // Volume slider
+        var slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100";
+        slider.value = "100";
+        slider.classList.add("volume-slider");
+        slider.title = "Ses Seviyesi";
+
+        // Volume label
+        var volLabel = document.createElement("span");
+        volLabel.classList.add("volume-label");
+        volLabel.innerText = "100";
+
+        controls.appendChild(muteButton);
+        controls.appendChild(slider);
+        controls.appendChild(volLabel);
+
+        // --- Close button ---
         var closeButton = document.createElement("button");
-        closeButton.innerText = "×";
+        closeButton.innerHTML = "×";
         closeButton.classList.add("closeButton");
+        closeButton.title = "Kapat";
+
+        // --- Assemble ---
+        div.appendChild(dragHandle);
+        div.appendChild(playerDiv);
+        div.appendChild(controls);
+        div.appendChild(closeButton);
+        main.appendChild(div);
+
+        if (currentLayout === "auto") adjustVideoSizes();
+
+        // ---- Event: Close ----
         closeButton.addEventListener("click", function () {
-          // Player'ı durdur ve temizle
           if (players[playerId]) {
             players[playerId].destroy();
             delete players[playerId];
           }
           main.removeChild(div);
-          adjustVideoSizes();
+          if (currentLayout === "auto") adjustVideoSizes();
         });
 
-        // Ses aç/kapat butonu
-        var muteButton = document.createElement("button");
-        muteButton.innerText = "🔊";
-        muteButton.classList.add("muteButton");
+        // ---- Event: Mute toggle ----
         muteButton.addEventListener("click", function () {
           var player = players[playerId];
-          if (!player) return;
+          if (!player || typeof player.isMuted !== "function") return;
           if (player.isMuted()) {
             player.unMute();
-            muteButton.innerText = "🔊";
+            var vol = player.getVolume();
+            muteButton.innerHTML = vol === 0 ? "🔇" : "🔊";
+            slider.value = vol;
+            volLabel.innerText = vol;
           } else {
             player.mute();
-            muteButton.innerText = "🔇";
+            muteButton.innerHTML = "🔇";
           }
         });
 
-        var div = document.createElement("div");
-        div.classList.add("video");
-        div.appendChild(playerDiv);
-        div.appendChild(muteButton);
-        div.appendChild(closeButton);
+        // ---- Event: Volume slider ----
+        slider.addEventListener("input", function () {
+          var player = players[playerId];
+          if (!player || typeof player.setVolume !== "function") return;
+          var vol = parseInt(slider.value, 10);
+          player.setVolume(vol);
+          volLabel.innerText = vol;
+          if (vol === 0) {
+            player.mute();
+            muteButton.innerHTML = "🔇";
+          } else {
+            player.unMute();
+            muteButton.innerHTML = "🔊";
+          }
+        });
 
-        main.appendChild(div);
-        adjustVideoSizes();
+        // ---- Drag & Drop events ----
+        div.addEventListener("dragstart", onDragStart);
+        div.addEventListener("dragover", onDragOver);
+        div.addEventListener("dragleave", onDragLeave);
+        div.addEventListener("drop", onDrop);
+        div.addEventListener("dragend", onDragEnd);
 
-        // YouTube Player oluştur
+        // ---- Create YT Player ----
         players[playerId] = new YT.Player(playerId, {
           videoId: videoId,
-          playerVars: {
-            autoplay: 1,
-            enablejsapi: 1
-          },
+          playerVars: { autoplay: 1, enablejsapi: 1 },
           events: {
             onReady: function (event) {
-              // Player hazır; buton durumunu senkronize et
+              var vol = event.target.getVolume();
+              slider.value = vol;
+              volLabel.innerText = vol;
               if (event.target.isMuted()) {
-                muteButton.innerText = "🔇";
-              } else {
-                muteButton.innerText = "🔊";
+                muteButton.innerHTML = "🔇";
+                slider.value = 0;
+                volLabel.innerText = 0;
               }
             }
           }
         });
 
-        // Input'u temizle
         document.getElementById("youtubeLink").value = "";
       }
 
+      // ---- Extract Video ID ----
       function extractVideoId(url) {
         var videoId = "";
-        if (url.includes("v=")) {
-          videoId = url.split("v=")[1];
-          var ampersandPosition = videoId.indexOf("&");
-          if (ampersandPosition !== -1) {
-            videoId = videoId.substring(0, ampersandPosition);
+        try {
+          var u = new URL(url);
+          if (u.hostname === "youtu.be") {
+            videoId = u.pathname.slice(1);
+          } else if (u.searchParams.get("v")) {
+            videoId = u.searchParams.get("v");
           }
-        } else if (url.includes("youtu.be/")) {
-          videoId = url.split("youtu.be/")[1];
-          var slashPosition = videoId.indexOf("/");
-          if (slashPosition !== -1) {
-            videoId = videoId.substring(0, slashPosition);
-          }
-          // query string varsa temizle
-          var qPosition = videoId.indexOf("?");
-          if (qPosition !== -1) {
-            videoId = videoId.substring(0, qPosition);
+        } catch (e) {
+          // Fallback for partial URLs
+          if (url.includes("v=")) {
+            videoId = url.split("v=")[1];
+            var amp = videoId.indexOf("&");
+            if (amp !== -1) videoId = videoId.substring(0, amp);
+          } else if (url.includes("youtu.be/")) {
+            videoId = url.split("youtu.be/")[1];
+            videoId = videoId.split(/[/?]/)[0];
           }
         }
-        return videoId;
+        return videoId.trim();
+      }
+
+      // ---- Layout ----
+      var layoutClasses = ["layout-auto","layout-1x1","layout-1x2","layout-2x2","layout-3x1","layout-4x1","layout-1p2","layout-1p3"];
+
+      function setLayout(layout, btn) {
+        var container = document.getElementById("videoContainer");
+        layoutClasses.forEach(function (c) { container.classList.remove(c); });
+        container.classList.add("layout-" + layout);
+        currentLayout = layout;
+
+        document.querySelectorAll(".layout-btn").forEach(function (b) { b.classList.remove("active"); });
+        if (btn) btn.classList.add("active");
+
+        if (layout === "auto") adjustVideoSizes();
       }
 
       function adjustVideoSizes() {
         var videos = document.querySelectorAll(".video");
-        var numVideos = videos.length;
-
-        if (numVideos === 1) {
-          videos.forEach(function (video) {
-            video.style.flex = "1 1 100%";
-          });
-        } else if (numVideos === 2) {
-          videos.forEach(function (video) {
-            video.style.flex = "1 1 50%";
-          });
-        } else {
-          videos.forEach(function (video) {
-            video.style.flex = "1 1 33.33%";
-          });
-        }
+        var n = videos.length;
+        var pct = n <= 1 ? 100 : n === 2 ? 50 : 33.33;
+        videos.forEach(function (v) {
+          v.style.flex = "0 0 calc(" + pct + "% - 12px)";
+          v.style.maxWidth = "calc(" + pct + "% - 12px)";
+        });
       }
 
-      // Dark Mode Toggle
+      // ---- Dark Mode ----
       function toggleDarkMode() {
-        var body = document.body;
-        var modeIcon = document.getElementById("modeIcon");
+        document.body.classList.toggle("dark-mode");
+        document.getElementById("modeIcon").innerHTML =
+          document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+      }
 
-        body.classList.toggle("dark-mode");
-        if (body.classList.contains("dark-mode")) {
-          modeIcon.innerHTML = "☀️";
-        } else {
-          modeIcon.innerHTML = "🌙";
+      // ---- Drag & Drop ----
+      function onDragStart(e) {
+        dragSrcEl = this;
+        this.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", ""); // Firefox gerektirir
+      }
+
+      function onDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (this !== dragSrcEl) this.classList.add("drag-over");
+        return false;
+      }
+
+      function onDragLeave() {
+        this.classList.remove("drag-over");
+      }
+
+      function onDrop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (dragSrcEl && dragSrcEl !== this) {
+          var container = document.getElementById("videoContainer");
+          var allVideos = Array.from(container.querySelectorAll(".video"));
+          var srcIdx = allVideos.indexOf(dragSrcEl);
+          var tgtIdx = allVideos.indexOf(this);
+
+          if (srcIdx < tgtIdx) {
+            container.insertBefore(dragSrcEl, this.nextSibling);
+          } else {
+            container.insertBefore(dragSrcEl, this);
+          }
         }
+        this.classList.remove("drag-over");
+        return false;
+      }
+
+      function onDragEnd() {
+        document.querySelectorAll(".video").forEach(function (v) {
+          v.classList.remove("dragging");
+          v.classList.remove("drag-over");
+        });
+        dragSrcEl = null;
       }
     </script>
   </body>
