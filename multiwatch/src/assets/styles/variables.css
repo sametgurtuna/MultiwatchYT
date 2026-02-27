@@ -1,0 +1,80 @@
+/* ─── Design Tokens ─────────────────────────────────────────────────────── */
+
+:root {
+  /* Surfaces */
+  --bg:            #0f0f13;
+  --surface:       #1a1a23;
+  --surface-raised:#252532;
+  --surface-hover: #2e2e40;
+
+  /* Accent */
+  --accent:        #7c5cfc;
+  --accent-hover:  #9b7dff;
+  --accent-dim:    rgba(124, 92, 252, 0.18);
+
+  /* Semantic */
+  --danger:        #ff5555;
+  --danger-hover:  #ff7070;
+  --success:       #3ddc84;
+  --warning:       #ffb347;
+
+  /* Text */
+  --text-primary:  #f0f0f5;
+  --text-muted:    #8b8ba0;
+  --text-inverse:  #1a1a23;
+
+  /* Borders */
+  --border:        #2e2e3e;
+  --border-focus:  #7c5cfc;
+
+  /* Panel */
+  --panel-bg:      #13131a;
+  --panel-header:  rgba(0,0,0,0.55);
+
+  /* Shadows */
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.4);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.6);
+
+  /* Radii */
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     12px;
+
+  /* Transitions */
+  --transition:    0.2s ease;
+
+  /* Header */
+  --header-height: 60px;
+
+  /* Z-indices */
+  --z-header:      100;
+  --z-overlay:     200;
+  --z-toast:       300;
+}
+
+/* Light mode overrides */
+[data-theme="light"] {
+  --bg:            #f5f5fa;
+  --surface:       #ffffff;
+  --surface-raised:#f0eff8;
+  --surface-hover: #e8e7f5;
+
+  --accent:        #6246ea;
+  --accent-hover:  #7c5cfc;
+  --accent-dim:    rgba(98, 70, 234, 0.12);
+
+  --text-primary:  #1a1a2e;
+  --text-muted:    #6b6b85;
+  --text-inverse:  #ffffff;
+
+  --border:        #d8d8e8;
+  --border-focus:  #6246ea;
+
+  --panel-bg:      #ffffff;
+  --panel-header:  rgba(245,245,250,0.9);
+
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.08);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.12);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.16);
+}
